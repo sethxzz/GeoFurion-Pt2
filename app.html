@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aplicações Técnicas - GeoFurion</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+  <link rel="icon" href="Imagens/Logo.png" type="image/png" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+</head>
+<body>
+  <img class="image-gradient" src="gradient.png" alt="">
+  <div class="layer-blur"></div>
+
+  <div class="container">
+    <header>
+      <a href="index.html" class="logo" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+        <img src="Imagens/Logo.png" alt="Logo GeoFurion" style="width: 40px; height: 40px;">
+        <h1 style="margin: 0; font-size: 2.5rem; color: white;">GeoFurion V1</h1>
+      </a>
+
+      <nav>
+        <a href="sobre.html">SOBRE</a>
+        <a href="funcionalidades.html">FUNCIONALIDADES</a>
+        <a href="app.html" class="active">APLICAÇÕES</a>
+        <a href="doc.html">DOCUMENTOS</a>
+      </nav>
+    </header>
+
+    <main>
+  <section class="content" data-aos="fade-up" data-aos-duration="1000">
+    <h1>Tecnologias</h1>
+    <p class="description">
+      O <span>GeoFurion</span> foi desenvolvido com foco em desempenho, segurança e inteligência de rastreamento em tempo real. Utiliza uma stack moderna que combina front-end leve com integração total a serviços backend e inteligência artificial embarcada.
+    </p>
+
+    <p class="description" style="margin-top: 1.5rem;">
+      Toda a comunicação com o sistema é feita por meio de APIs RESTful construídas em Node.js, com autenticação JWT e criptografia de dados sensíveis. O banco MongoDB é utilizado para armazenar posições geográficas, registros temporais e logs de eventos.
+    </p>
+
+    <p class="description" style="margin-top: 1.5rem;">
+      O Agente <strong>Furii AI</strong> foi integrado diretamente ao sistema, oferecendo interação automatizada, comandos de voz/texto e aprendizado contínuo com base nos dados coletados. Além disso, o sistema é hospedado em nuvem com escalabilidade e suporte para integrações IoT.
+    </p>
+  </section>
+</main>
+
+  </div>
+
+<section class="benefits-section">
+  <div class="benefits-overlay">
+    <h2 class="benefits-title">Stack Tecnológica do GeoFurion</h2>
+    <p class="benefits-subtitle">Conheça os principais recursos e ferramentas utilizadas na construção da plataforma:</p>
+
+    <div class="benefits-grid-modern">
+
+      <div class="benefit-modern">
+        <div class="benefit-icon"><i class='bx bx-code-alt'></i></div>
+        <h3>Frontend Moderno</h3>
+        <p>Construído com HTML5, CSS3 e JavaScript Vanilla para leveza, responsividade e performance nativa.</p>
+      </div>
+
+      <div class="benefit-modern">
+        <div class="benefit-icon"><i class='bx bxl-nodejs'></i></div>
+        <h3>API em Node.js</h3>
+        <p>Back-end leve com Node.js e Express, fornecendo rotas seguras e escaláveis para os serviços do sistema.</p>
+      </div>
+
+      <div class="benefit-modern">
+        <div class="benefit-icon"><i class='bx bx-data'></i></div>
+        <h3>Banco de Dados</h3>
+        <p>Utiliza MongoDB para armazenar posições geográficas e eventos com alta disponibilidade e indexação geoespacial.</p>
+      </div>
+
+      <div class="benefit-modern">
+        <div class="benefit-icon"><i class='bx bx-brain'></i></div>
+        <h3>Agente Furii AI</h3>
+        <p>Agente inteligente baseado em IA generativa, integrado ao front com respostas contextuais personalizadas.</p>
+      </div>
+
+      <div class="benefit-modern">
+        <div class="benefit-icon"><i class='bx bx-mobile-alt'></i></div>
+        <h3>Compatibilidade Mobile</h3>
+        <p>Design responsivo e otimizado para dispositivos móveis com comunicação em tempo real via WebSockets.</p>
+      </div>
+
+      <div class="benefit-modern">
+        <div class="benefit-icon"><i class='bx bx-lock'></i></div>
+        <h3>Segurança e Criptografia</h3>
+        <p>Autenticação por token JWT, proteção de dados sensíveis e criptografia ponta a ponta no rastreamento.</p>
+      </div>
+
+      <div class="benefit-modern">
+        <div class="benefit-icon"><i class='bx bx-cloud'></i></div>
+        <h3>Infraestrutura em Nuvem</h3>
+        <p>Hospedado em servidores escaláveis com backups automáticos e deploy contínuo via serviços cloud.</p>
+      </div>
+
+      <div class="benefit-modern">
+        <div class="benefit-icon"><i class='bx bx-extension'></i></div>
+        <h3>Integrações Externas</h3>
+        <p>APIs RESTful disponíveis para integrar sistemas legados, sensores IoT e plataformas de terceiros.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+
+  <!-- Chat da Furii -->
+  <div id="furii-chat-button">
+    <img src="Imagens/furihead.png" alt="Furii" />
+  </div>
+
+  <div id="furii-chat-modal" class="hidden">
+    <div class="chat-header">
+      <div class="chat-title">
+        <img src="Imagens/furihead.png" alt="Furii" class="furii-icon">
+        <h3>Furii</h3>
+        <span class="beta-label">BETA</span>
+      </div>
+      <span id="close-chat">&times;</span>
+    </div>
+    <div class="chat-body" id="chat-body">
+      <div class="furii-msg">Olá! Eu sou a Furii. Como posso te ajudar hoje?</div>
+    </div>
+    <div class="chat-suggestions">
+      <button class="chat-option">Como funciona o rastreamento?</button>
+      <button class="chat-option">Quais dispositivos são compatíveis?</button>
+      <button class="chat-option">O rastreamento é por GPS ou Wi-Fi?</button>
+      <button class="chat-option">É necessário internet para funcionar?</button>
+    </div>
+    <div class="chat-footer">
+      <input type="text" id="user-input" placeholder="Escreva sua mensagem..." />
+      <button id="send-btn" class="icon-send">
+        <i class='bx bx-send'></i> 
+      </button>
+    </div>
+  </div>
+
+  <!-- Rodapé -->
+     <footer class="footer">
+  <div class="footer-content">
+    <div class="footer-column">
+      <a href="#home" class="footer-logo">
+        <img src="Imagens/Logo.png" alt="GeoFurion Logo" style="height: 50px;">
+      </a>
+      <p class="footer-description">
+        GeoFurion combina precisão, segurança e tecnologia de ponta para um rastreamento ético e inteligente.
+      </p>
+      <div class="social-media">
+        <a href="#"><i class='bx bxl-instagram'></i></a>
+        <a href="#"><i class='bx bxl-github'></i></a>
+        <a href="#"><i class='bx bxl-linkedin'></i></a>
+        <a href="mailto:geofurioncontact@gmail.com"><i class='bx bxl-gmail'></i></a>
+      </div>
+    </div>
+
+    <div class="footer-column">
+      <h4>Links Rápidos</h4>
+      <ul>
+        <li><a href="#precos">Planos</a></li>
+        <li><a href="sobre.html">Sobre</a></li>
+        <li><a href="funcionalidades.html">Funcionalidades</a></li>
+        <li><a href="app.html">Aplicações</a></li>
+        <li><a href="doc.html">Documentação</a></li>
+      </ul>
+    </div>
+
+<div class="footer-column">
+  <h4>Contato</h4>
+  <ul>
+    <li>
+      <i class='bx bxs-map'></i>
+      <a href="#">São Paulo, Brasil</a>
+    </li>
+    <li>
+      <i class='bx bxs-envelope'></i>
+      <a href="mailto:geofurioncontact@gmail.com">geofurioncontact@gmail.com</a>
+    </li>
+    <li>
+      <i class='bx bxs-phone'></i>
+      <a href="tel:+5511999990000">(11) 969217663</a>
+    </li>
+  </ul>
+</div>
+
+
+
+<div class="footer-column">
+  <h4>Apoie Financeiramente!</h4>
+  <a href="https://www.catarse.me/seuprojeto" target="_blank" class="catarse-footer-link">
+    <img src="Imagens/catarse.png" alt="Catarse" class="catarse-footer-logo">
+  </a>
+</div>
+
+
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2025 GeoFurion. Todos os direitos reservados.</p>
+    <div class="footer-bottom-links">
+      <a href="politi.html">Política de Privacidade</a>
+      <a href="#top" class="whatsapp-link">Voltar ao topo</a>
+    </div>
+  </div>
+
+  <div class="footer-iconTop">
+    <a href="#top"><i class='bx bx-up-arrow-alt'></i></a>
+  </div>
+</footer>
+
+
+  <script src="script.js"></script>
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    AOS.init();
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,15 @@
+{
+  "name": "furii-servidor",
+  "version": "1.0.0",
+  "description": "Servidor IA da Furii usando Node.js, Express e OpenAI",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "axios": "^1.10.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "openai": "^4.24.0"
+  }
+}

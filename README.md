@@ -1,4 +1,4 @@
-# GeoFurion V1 (ainda em formação)
+# GeoFurion V2 (ainda em formação)
 
 GeoFurion é uma plataforma de rastreamento inteligente baseada em geolocalização híbrida e inteligência artificial. Com foco em segurança, precisão e performance, ele permite o monitoramento em tempo real de dispositivos móveis e desktops através de uma interface moderna, responsiva e segura.
 

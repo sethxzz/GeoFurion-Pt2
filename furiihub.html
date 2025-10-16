@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Furii AI Hub - GeoFurion</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+  <link rel="icon" href="Imagens/Logo.png" type="image/png" />
+  <style>
+    #boot-screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at center, #0a0012, #000);
+      z-index: 9999;
+      color: white;
+      font-family: 'Consolas', monospace;
+      animation: fadeOutBoot 1.2s ease forwards;
+      animation-delay: 3.5s;
+    }
+    #boot-screen.hidden { display: none; }
+    .boot-logo {
+      width: 140px; height: 140px; margin-bottom: 1rem;
+      filter: drop-shadow(0 0 25px #5300a0);
+      animation: pulseLogo 3s infinite;
+    }
+    @keyframes pulseLogo {
+      0%,100%{transform:scale(1);opacity:1;}
+      50%{transform:scale(1.15);opacity:0.8;}
+    }
+    .boot-text {
+      font-size: 1rem; letter-spacing: 1px; color: #a065ff;
+      margin-top: 1rem; opacity: 0;
+      animation: fadeInBoot .8s ease forwards; animation-delay:1.2s;
+    }
+    @keyframes fadeInBoot { to{opacity:1;} }
+    .boot-loading { margin-top: 1.5rem; display:flex; gap:8px; }
+    .dot { width:10px; height:10px; background-color:#a065ff; border-radius:50%; animation:blink 1.5s infinite; }
+    .dot:nth-child(2){animation-delay:.3s;} .dot:nth-child(3){animation-delay:.6s;}
+    @keyframes blink {0%,80%,100%{opacity:.2;transform:scale(1);}40%{opacity:1;transform:scale(1.5);}}
+    @keyframes fadeOutBoot {0%{opacity:1;visibility:visible;}100%{opacity:0;visibility:hidden;}}
+    #particles-bg {
+      position: fixed; top:0; left:0; width:100%; height:100%;
+      background: radial-gradient(circle at 50% 20%, rgba(83,0,160,.15), rgba(0,0,0,1));
+      overflow:hidden; z-index:0;
+    }
+    .particle { position:absolute; width:4px; height:4px; background:#a065ff; border-radius:50%; opacity:.7; animation:floatUp linear infinite; }
+    @keyframes floatUp {from{transform:translateY(100vh) scale(.5);opacity:.3;}to{transform:translateY(-10vh) scale(1.2);opacity:1;}}
+    .hub-container {
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      min-height:100vh; color:white; text-align:center; position:relative; z-index:10;
+      perspective:1200px; opacity:0; animation:fadeInHub 1.5s ease forwards; animation-delay:3.5s;
+    }
+    @keyframes fadeInHub {to{opacity:1;}}
+    .hub-box {
+      background:linear-gradient(135deg,#0b0010,#160026);
+      border:2px solid #5300a0; box-shadow:0 0 45px rgba(130,0,255,.4);
+      border-radius:20px; padding:2.5rem 3rem; width:100%; max-width:420px;
+      transform-style:preserve-3d; transform:rotateY(-25deg) scale(.95);
+      animation:openPanel 1.5s ease forwards; animation-delay:3.5s; backdrop-filter:blur(10px);
+    }
+    @keyframes openPanel {
+      0%{opacity:0;transform:rotateY(-80deg) scale(.7);}
+      60%{opacity:1;transform:rotateY(10deg) scale(1.03);}
+      100%{transform:rotateY(0) scale(1);}
+    }
+    .hub-tabs {display:flex;justify-content:center;margin-bottom:1.5rem;gap:1rem;}
+    .hub-tab {
+      padding:.6rem 1.4rem;border-radius:30px;border:1px solid #5300a0;
+      background:transparent;color:#a065ff;cursor:pointer;transition:.3s;
+    }
+    .hub-tab:hover{background:rgba(83,0,160,.3);transform:scale(1.05);}
+    .hub-tab.active{background:#5300a0;color:white;box-shadow:0 0 15px #5300a0;}
+    .hub-form{display:none;flex-direction:column;gap:1rem;text-align:left;transition:.3s;}
+    .hub-form.active{display:flex;animation:fadeIn .6s ease;}
+    @keyframes fadeIn {from{opacity:0;transform:translateY(15px);}to{opacity:1;transform:translateY(0);}}
+    .hub-form input {
+      padding:.8rem 1rem;border-radius:8px;border:1px solid #5300a0;
+      background-color:#0a0012;color:white;outline:none;transition:border-color .3s,box-shadow .3s;
+    }
+    .hub-form input:focus{border-color:#a065ff;box-shadow:0 0 12px #5300a0;}
+    .hub-form button {
+      background:linear-gradient(90deg,#5300a0,#8f21b1);
+      border:none;padding:.8rem;color:white;font-weight:bold;
+      border-radius:30px;cursor:pointer;transition:.3s;
+    }
+    .hub-form button:hover{transform:scale(1.05);box-shadow:0 0 20px #8f21b1;}
+    .hub-logo {
+      width:90px;height:90px;margin-bottom:1rem;animation:pulseLogo 3s infinite;
+      filter:drop-shadow(0 0 15px #5300a0);
+    }
+    .hub-footer{margin-top:2rem;font-size:.85rem;color:#aaa;opacity:.8;}
+    h1{text-shadow:0 0 15px #5300a0,0 0 30px #8f21b1;}
+    .lang-select {
+      position:absolute;top:1.5rem;right:1.5rem;background:#0b0010;
+      border:1px solid #5300a0;color:#a065ff;border-radius:6px;padding:.3rem .6rem;
+      cursor:pointer;z-index:20;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="boot-screen">
+    <img src="Imagens/furihead.png" alt="Furii Logo" class="boot-logo">
+    <h2>FURII AI SYSTEM</h2>
+    <p class="boot-text">Inicializando rede neural...</p>
+    <div class="boot-loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  </div>
+
+  <div id="particles-bg"></div>
+
+  <div class="container">
+    <select id="lang" class="lang-select">
+      <option value="pt-BR" selected>🇧🇷 PT-BR</option>
+      <option value="en-US">🇺🇸 EN-US</option>
+    </select>
+
+    <main class="hub-container">
+      <img src="Imagens/furihead.png" alt="Furii Logo" class="hub-logo">
+      <h1>Furii AI Hub</h1>
+      <p style="color:#aaa;margin-bottom:1.5rem;">Acesse a rede neural do GeoFurion</p>
+
+      <div class="hub-box">
+        <div class="hub-tabs">
+          <button class="hub-tab active" id="login-tab">Login</button>
+          <button class="hub-tab" id="register-tab">Registrar</button>
+        </div>
+
+        <form class="hub-form active" id="login-form">
+          <input type="email" id="email" placeholder="E-mail" required />
+          <input type="password" id="senha" placeholder="Senha" required />
+          <button type="submit">Entrar</button>
+        </form>
+
+        <form class="hub-form" id="register-form">
+          <input type="text" placeholder="Nome completo" required />
+          <input type="email" placeholder="E-mail" required />
+          <input type="password" placeholder="Crie uma senha" required />
+          <button type="submit">Registrar</button>
+        </form>
+      </div>
+
+      <div class="hub-footer"><p>© 2025 Furii AI Hub | GeoFurion Technologies</p></div>
+    </main>
+  </div>
+
+  <audio id="ui-click" src="https://cdn.jsdelivr.net/gh/ARCADE-AUDIO/ui-click.mp3"></audio>
+  <audio id="ui-tab" src="https://cdn.jsdelivr.net/gh/ARCADE-AUDIO/ui-tab.mp3"></audio>
+
+  <script>
+    setTimeout(() => document.getElementById("boot-screen").classList.add("hidden"), 4500);
+
+    const langSelect = document.getElementById("lang");
+    let idioma = "pt-BR";
+
+    function falarFurii(texto) {
+      if (!('speechSynthesis' in window)) return;
+      const msg = new SpeechSynthesisUtterance(texto);
+      msg.lang = idioma;
+      msg.pitch = 1.1;
+      msg.rate = 1;
+      msg.volume = 1;
+      const vozes = window.speechSynthesis.getVoices();
+      const voz = vozes.find(v => v.lang.startsWith(idioma.split('-')[0]) && v.name.toLowerCase().includes('female'));
+      if (voz) msg.voice = voz;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(msg);
+    }
+
+    setTimeout(() => {
+      const falaPT = "Olá, humano. Eu sou a Furii. Bem-vindo ao Furii AI Hub.";
+      const falaEN = "Hello, human. I am Furii. Welcome to the Furii AI Hub.";
+      falarFurii(idioma === "pt-BR" ? falaPT : falaEN);
+    }, 3800);
+
+    langSelect.addEventListener("change", e => {
+      idioma = e.target.value;
+      const frase = idioma === "pt-BR" ? "Idioma alterado para português." : "Language changed to English.";
+      falarFurii(frase);
+    });
+
+    const loginTab = document.getElementById("login-tab");
+    const registerTab = document.getElementById("register-tab");
+    const loginForm = document.getElementById("login-form");
+    const registerForm = document.getElementById("register-form");
+    const clickSound = document.getElementById("ui-click");
+    const tabSound = document.getElementById("ui-tab");
+
+    const playSound = (audio) => { audio.currentTime = 0; audio.volume = 0.25; audio.play(); };
+
+    loginTab.addEventListener("click", () => {
+      playSound(tabSound);
+      loginTab.classList.add("active");
+      registerTab.classList.remove("active");
+      loginForm.classList.add("active");
+      registerForm.classList.remove("active");
+    });
+
+    registerTab.addEventListener("click", () => {
+      playSound(tabSound);
+      registerTab.classList.add("active");
+      loginTab.classList.remove("active");
+      registerForm.classList.add("active");
+      loginForm.classList.remove("active");
+    });
+
+    document.querySelectorAll("button").forEach(btn => {
+      btn.addEventListener("click", () => playSound(clickSound));
+    });
+
+    const bg = document.getElementById('particles-bg');
+    for (let i = 0; i < 40; i++) {
+      const p = document.createElement('div');
+      p.classList.add('particle');
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.animationDuration = 6 + Math.random() * 10 + 's';
+      p.style.animationDelay = Math.random() * 5 + 's';
+      bg.appendChild(p);
+    }
+
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const falaPT = "Acesso concedido. Redirecionando para o painel.";
+      const falaEN = "Access granted. Redirecting to the dashboard.";
+      falarFurii(idioma === "pt-BR" ? falaPT : falaEN);
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 2000);
+    });
+
+    loginForm.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        loginForm.requestSubmit();
+      }
+    });
+
+    document.getElementById("login-form").addEventListener("submit", e => {
+  e.preventDefault();
+  // simula login bem-sucedido
+  window.location.href = "dashboard.html";
+});
+
+  </script>
+</body>
+</html>
+

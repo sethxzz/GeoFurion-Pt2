@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoFurion Dashboard - Pro</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+  <link rel="icon" href="Imagens/Logo.png" type="image/png" />
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+  <style>
+    body {
+      margin: 0;
+      background-color: #000;
+      font-family: system-ui, sans-serif;
+      overflow: hidden;
+      color: #fff;
+    }
+
+    .dashboard-container {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* MENU LATERAL - IDÊNTICO AO DASHBOARD */
+    .sidebar {
+      width: 80px;
+      background: linear-gradient(180deg, #0a0012, #140022);
+      border-right: 2px solid #5300a0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem 0;
+      box-shadow: 0 0 25px rgba(130, 0, 255, 0.25);
+      z-index: 10;
+    }
+
+    .sidebar-logo {
+      width: 48px;
+      margin-bottom: 2rem;
+      filter: drop-shadow(0 0 10px #5300a0);
+    }
+
+    .sidebar a {
+      color: #a065ff;
+      text-decoration: none;
+      font-size: 1.6rem;
+      margin: 1rem 0;
+      transition: 0.3s;
+    }
+
+    .sidebar a:hover {
+      color: #fff;
+      transform: scale(1.1);
+    }
+
+    .sidebar a.active {
+      color: #fff;
+      text-shadow: 0 0 10px #8f21b1;
+    }
+
+    /* CONTEÚDO PRINCIPAL */
+    .main-content {
+      flex: 1;
+      position: relative;
+      overflow-y: auto;
+      height: 100vh;
+    }
+
+    .topbar {
+      background: rgba(0, 0, 0, 0.8);
+      border-bottom: 1px solid #5300a0;
+      padding: 0.8rem 1.5rem;
+      font-size: 1.2rem;
+      color: #a065ff;
+      box-shadow: 0 0 15px rgba(130, 0, 255, 0.2);
+      z-index: 5;
+      position: sticky;
+      top: 0;
+    }
+
+    /* ÁREA DOS GRÁFICOS */
+    .charts-container {
+      padding: 1.5rem 2rem;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    .chart-card {
+      background: rgba(12, 0, 24, 0.6);
+      border: 1px solid rgba(130, 0, 255, 0.3);
+      box-shadow: 0 0 25px rgba(130, 0, 255, 0.15);
+      border-radius: 14px;
+      padding: 1rem 1.2rem;
+      transition: 0.3s;
+    }
+
+    .chart-card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 35px #8f21b1;
+    }
+
+    .chart-card h2 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      color: #fff;
+      font-weight: 500;
+      text-shadow: 0 0 8px #a065ff;
+    }
+
+    .chart-card p {
+      color: #c7b8e4;
+      font-size: 0.85rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .chart {
+      width: 100%;
+      height: 260px;
+    }
+
+    .span-2 { grid-column: span 2; }
+    .tall { min-height: 320px; }
+
+    /* PREDIÇÃO */
+    .prediction .pred-item {
+      margin-bottom: 12px;
+    }
+
+    .prediction .pred-item span {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+    }
+
+    .bar {
+      height: 8px;
+      background: rgba(83, 0, 160, 0.25);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #5300a0, #8f21b1);
+      width: 0%;
+      box-shadow: 0 0 12px #8f21b1;
+      transition: width 1s ease;
+    }
+
+    @media (max-width: 1100px) {
+      .charts-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 800px) {
+      .charts-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* === SCROLLBAR FUTURISTA FURII === */
+.main-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+.main-content::-webkit-scrollbar-track {
+  background: rgba(10, 0, 20, 0.15);
+  border-radius: 10px;
+  box-shadow: inset 0 0 8px rgba(80, 0, 130, 0.25);
+}
+
+.main-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(160, 80, 255, 0.9), rgba(83, 0, 160, 0.7));
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(160, 80, 255, 0.6), 0 0 20px rgba(83, 0, 160, 0.4);
+  animation: glowScroll 2.4s infinite ease-in-out;
+}
+
+.main-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(200, 120, 255, 1), rgba(130, 0, 255, 0.8));
+  box-shadow: 0 0 20px rgba(200, 120, 255, 0.9);
+}
+
+@keyframes glowScroll {
+  0%, 100% { box-shadow: 0 0 10px rgba(160, 80, 255, 0.6); }
+  50% { box-shadow: 0 0 25px rgba(200, 120, 255, 1); }
+}
+
+/* Suporte para Firefox */
+.main-content {
+  scrollbar-color: rgba(160, 80, 255, 0.8) rgba(10, 0, 20, 0.15);
+  scrollbar-width: thin;
+}
+
+  </style>
+</head>
+
+<body>
+  <div class="dashboard-container">
+    <!-- MENU LATERAL -->
+    <aside class="sidebar">
+      <a href="furiichat.html">
+  <img src="Imagens/furihead.png" alt="Furii" class="sidebar-logo" />
+</a>
+
+      <a href="dashboard.html" title="Painel"><i class='bx bx-home'></i></a>
+      <a href="graficos.html" class="active" title="Gráficos"><i class='bx bx-bar-chart-alt-2'></i></a>
+      <a href="historico.html" title="Histórico"><i class='bx bx-time'></i></a>
+      <a href="conta.html" title="Conta"><i class='bx bx-user'></i></a>
+      <a href="configuracoes.html" title="Configurações"><i class='bx bx-cog'></i></a>
+      <a href="furiihub.html" title="Sair"><i class='bx bx-log-out'></i></a>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="main-content">
+      <header class="topbar">
+        <i class='bx bx-pulse'></i> GeoFurion Dashboard - Pro
+      </header>
+
+      <!-- GRÁFICOS -->
+      <section class="charts-container">
+        <div class="chart-card span-2">
+          <h2>DISTRIBUIÇÃO DO DIA</h2>
+          <p>Percentual de tempo passado em casa, trabalho, faculdade e outros locais.</p>
+          <div id="dayDist" class="chart"></div>
+        </div>
+
+        <div class="chart-card">
+          <h2>DISPOSITIVOS ATIVOS</h2>
+          <p>Atividade registrada nas últimas 12 horas.</p>
+          <div id="devicesChart" class="chart"></div>
+        </div>
+
+        <div class="chart-card">
+          <h2>ZONAS SEGURAS</h2>
+          <p>Status atual das zonas monitoradas.</p>
+          <div id="zonesChart" class="chart"></div>
+        </div>
+
+        <div class="chart-card">
+          <h2>FURII AI - PRECISÃO</h2>
+          <p>Desempenho dos módulos inteligentes.</p>
+          <div id="aiChart" class="chart"></div>
+        </div>
+
+        <div class="chart-card">
+          <h2>LOGS DE SEGURANÇA</h2>
+          <p>Eventos detectados nas últimas 24h.</p>
+          <div id="securityChart" class="chart"></div>
+        </div>
+
+        <div class="chart-card">
+          <h2>TRÁFEGO DE DADOS</h2>
+          <p>Volume total processado por dia.</p>
+          <div id="trafficChart" class="chart"></div>
+        </div>
+
+        <div class="chart-card tall">
+          <h2>MOVIMENTAÇÃO - REPLAY</h2>
+          <p>Rotas recentes.</p>
+          <div id="routeChart" class="chart"></div>
+        </div>
+
+        <div class="chart-card">
+          <h2>RANKING DE LOCAIS</h2>
+          <p>Locais mais visitados.</p>
+          <div id="rankChart" class="chart"></div>
+        </div>
+
+        <div class="chart-card span-2 prediction">
+          <h2>FURII AI - PREDIÇÃO DE LOCAIS AMANHÃ</h2>
+          <p>Baseado na sua rotina, estes são os locais prováveis de visita:</p>
+          <div id="predList"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const optsBase = {
+      chart:{ foreColor:'#e7dfff', toolbar:{show:false}, background:'transparent' },
+      tooltip:{ theme:'dark' }
+    };
+
+    new ApexCharts(document.querySelector("#dayDist"), {
+      ...optsBase,
+      chart:{...optsBase.chart,type:'donut',height:300},
+      series:[40,35,15,10],
+      labels:['Casa','Trabalho','Faculdade','Outros'],
+      colors:['#8f21b1','#a065ff','#5300a0','#b089ff'],
+      legend:{labels:{colors:'#d9cff8'}},
+      plotOptions:{pie:{donut:{size:'65%'}}}
+    }).render();
+
+    new ApexCharts(document.querySelector("#devicesChart"), {
+      ...optsBase,
+      chart:{...optsBase.chart,type:'area',height:260},
+      series:[{name:'Ativos',data:[4,6,8,10,12,11,9,8,7,10,12,14]}],
+      colors:['#a065ff'],
+      stroke:{curve:'smooth',width:3},
+      fill:{type:'gradient',gradient:{shadeIntensity:.4,opacityFrom:.4,opacityTo:.05}}
+    }).render();
+
+    new ApexCharts(document.querySelector("#zonesChart"), {
+      ...optsBase,
+      chart:{...optsBase.chart,type:'radialBar',height:260},
+      series:[75],
+      labels:['Zonas Ativas (%)'],
+      colors:['#8f21b1'],
+      plotOptions:{radialBar:{hollow:{size:'65%'},dataLabels:{value:{color:'#fff',fontSize:'20px'}}}}
+    }).render();
+
+    new ApexCharts(document.querySelector("#aiChart"), {
+      ...optsBase,
+      chart:{...optsBase.chart,type:'radar',height:260},
+      series:[{name:'Precisão',data:[92,88,95,90,94]}],
+      labels:['Predição','Rotas','Alertas','Voz','Padrões'],
+      colors:['#a065ff'],
+      fill:{opacity:0.3}
+    }).render();
+
+    new ApexCharts(document.querySelector("#securityChart"), {
+      ...optsBase,
+      chart:{...optsBase.chart,type:'bar',height:260},
+      series:[{name:'Eventos',data:[50,30,10,5]}],
+      xaxis:{categories:['Acessos','Alertas','Erros','Críticos'],labels:{style:{colors:'#d9cff8'}}},
+      colors:['#5300a0'],
+      plotOptions:{bar:{borderRadius:6,columnWidth:'60%'}}
+    }).render();
+
+    new ApexCharts(document.querySelector("#trafficChart"), {
+      ...optsBase,
+      chart:{...optsBase.chart,type:'bar',height:260},
+      series:[{name:'MB',data:[180,210,240,260,200,150,190]}],
+      xaxis:{categories:['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],labels:{style:{colors:'#d9cff8'}}},
+      colors:['#8f21b1'],
+      plotOptions:{bar:{borderRadius:6,columnWidth:'55%'}}
+    }).render();
+
+    new ApexCharts(document.querySelector("#routeChart"), {
+      ...optsBase,
+      chart:{...optsBase.chart,type:'line',height:300},
+      series:[{name:'Rotas',data:[1,3,2,5,4,6,8,7,5,6]}],
+      colors:['#a065ff'],
+      stroke:{curve:'smooth',width:2}
+    }).render();
+
+    new ApexCharts(document.querySelector("#rankChart"), {
+      ...optsBase,
+      chart:{...optsBase.chart,type:'bar',height:260},
+      series:[{name:'Visitas',data:[15,12,9,7]}],
+      xaxis:{categories:['Morumbi','Ibirapuera','Paulista','Pinheiros'],labels:{style:{colors:'#d9cff8'}}},
+      colors:['#8f21b1'],
+      plotOptions:{bar:{borderRadius:6,columnWidth:'60%'}}
+    }).render();
+
+    const preds = [
+      { place:'Trabalho — Av. Paulista', prob:48 },
+      { place:'Faculdade — USP', prob:25 },
+      { place:'Shopping Morumbi', prob:12 },
+      { place:'Parque Ibirapuera', prob:8 },
+      { place:'Pinheiros (cafés)', prob:7 }
+    ];
+    const container = document.querySelector('#predList');
+    preds.forEach((p,i)=>{
+      const div=document.createElement('div');
+      div.className='pred-item';
+      div.innerHTML=`<span><b>${p.place}</b><b>${p.prob}%</b></span><div class='bar'><i></i></div>`;
+      container.appendChild(div);
+      setTimeout(()=>div.querySelector('i').style.width=p.prob+'%',100*i);
+    });
+
+    // =============================================
+// 📊 INTEGRAÇÃO COM A FURII
+// =============================================
+const locaisSalvos = JSON.parse(localStorage.getItem("furiiLocais") || "{}");
+
+if (Object.keys(locaisSalvos).length > 0) {
+  const seriesAtualizadas = [
+    locaisSalvos.casa || 40,
+    locaisSalvos.trabalho || 35,
+    locaisSalvos.faculdade || 15,
+    locaisSalvos.outros || 10
+  ];
+
+  // Atualiza o gráfico de distribuição do dia
+  ApexCharts.exec("dayDist", "updateSeries", seriesAtualizadas);
+
+  console.log("✅ Gráfico atualizado com dados da Furii:", seriesAtualizadas);
+}
+
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+

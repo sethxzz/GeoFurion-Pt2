@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoFurion Dashboard - Pro</title>
+
+  <!-- Mantido igual ao dashboard.html -->
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+  <link rel="icon" href="Imagens/Logo.png" type="image/png" />
+
+  <!-- Leaflet (mantido como no dashboard) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- ApexCharts para os gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+  <style>
+    /* CSS copiado do dashboard.html — sidebar e header idênticos */
+    body {
+      margin: 0;
+      background-color: #000;
+      font-family: system-ui, sans-serif;
+      overflow: hidden;
+      color: #fff;
+    }
+
+    .dashboard-container {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* MENU LATERAL (IGUAL) */
+    .sidebar {
+      width: 80px;
+      background: linear-gradient(180deg, #0a0012, #140022);
+      border-right: 2px solid #5300a0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem 0;
+      box-shadow: 0 0 25px rgba(130, 0, 255, 0.25);
+      z-index: 10;
+    }
+
+    .sidebar-logo {
+      width: 48px;
+      margin-bottom: 2rem;
+      filter: drop-shadow(0 0 10px #5300a0);
+    }
+
+    .sidebar a {
+      color: #a065ff;
+      text-decoration: none;
+      font-size: 1.6rem;
+      margin: 1rem 0;
+      transition: 0.3s;
+    }
+
+    .sidebar a:hover {
+      color: #fff;
+      transform: scale(1.1);
+    }
+
+    .sidebar a.active {
+      color: #fff;
+      text-shadow: 0 0 10px #8f21b1;
+    }
+
+    /* ÁREA PRINCIPAL (HEADER idêntico) */
+    .main-content {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .topbar {
+      background: rgba(0, 0, 0, 0.8);
+      border-bottom: 1px solid #5300a0;
+      padding: 0.8rem 1.5rem;
+      font-size: 1.2rem;
+      color: #a065ff;
+      box-shadow: 0 0 15px rgba(130, 0, 255, 0.2);
+      z-index: 5;
+      position: relative;
+    }
+
+    /* Zonas / mapa (mantidos do dashboard) */
+    #map {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      filter: brightness(1) contrast(1.05) saturate(1.2);
+    }
+
+    .dark-zone {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(83, 0, 160, 0.4), rgba(83, 0, 160, 0.05));
+      box-shadow: 0 0 25px rgba(83, 0, 160, 0.4);
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .dark-zone.zone1 {
+      width: 300px;
+      height: 300px;
+      top: 46%;
+      left: 54%;
+      animation: pulse 3s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.15); opacity: 0.6; }
+    }
+
+    .marker {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #8f21b1;
+      box-shadow: 0 0 15px #a065ff, 0 0 35px #5300a0;
+      top: 50%;
+      left: 55%;
+      z-index: 4;
+      transform: translate(-50%, -50%);
+    }
+
+    .marker-label {
+      position: absolute;
+      top: calc(50% - 45px);
+      left: 55%;
+      transform: translateX(-50%);
+      color: #fff;
+      background: rgba(83, 0, 160, 0.25);
+      border: 1px solid rgba(160, 80, 255, 0.3);
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 0 15px rgba(130, 0, 255, 0.3);
+      white-space: nowrap;
+      z-index: 5;
+    }
+
+    .sensor {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #8f21b1;
+      box-shadow: 0 0 10px #a065ff, 0 0 25px #5300a0;
+      animation: blink 2.5s infinite ease-in-out;
+      opacity: 0.8;
+      z-index: 3;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 0.9; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(0.7); }
+    }
+
+    .hud-container {
+      position: absolute;
+      top: 90px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      z-index: 6;
+    }
+
+    .hud-card {
+      background: rgba(12, 0, 24, 0.6);
+      border: 1px solid rgba(130, 0, 255, 0.3);
+      box-shadow: 0 0 25px rgba(130, 0, 255, 0.15);
+      border-radius: 14px;
+      padding: 12px 16px;
+      min-width: 250px;
+      backdrop-filter: blur(8px);
+      transition: 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .hud-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px #8f21b1;
+    }
+
+    .hud-card i {
+      font-size: 1.4rem;
+      color: #a065ff;
+    }
+
+    .hud-card h4 {
+      margin: 0;
+      font-size: 0.95rem;
+      color: #fff;
+    }
+
+    .hud-card p {
+      margin: 0;
+      font-size: 0.75rem;
+      color: #aaa;
+    }
+
+    /* Estilos para os componentes de histórico (mantidos em conjunto com o header/sidebar idênticos) */
+    .inner-content {
+      position: relative;
+      padding: 1.5rem 2rem;
+      z-index: 4;
+      height: calc(100vh - 64px); /* abaixo do topbar */
+      overflow-y: auto;
+    }
+
+    /* Cards / layout histórico */
+    .content-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      align-items: start;
+    }
+
+    .card {
+      background: rgba(12, 0, 24, 0.6);
+      border: 1px solid rgba(130, 0, 255, 0.3);
+      box-shadow: 0 0 25px rgba(130, 0, 255, 0.12);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .card h3 {
+      margin: 0 0 8px 0;
+      color: #fff;
+      text-shadow: 0 0 8px #a065ff;
+      font-size: 0.98rem;
+    }
+
+    .chart { width: 100%; height: 220px; }
+
+    table { width: 100%; border-collapse: collapse; color: #fff; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid rgba(130,0,255,0.12); text-align: left; }
+    thead { background: rgba(83,0,160,0.08); }
+
+    .timeline { margin-top: 12px; padding-left: 18px; border-left: 2px solid #8f21b1; }
+    .timeline-item { margin-bottom: 14px; }
+    .timeline-item::before { content:''; position: absolute; margin-left:-22px; width:10px; height:10px; background:#8f21b1; border-radius:50%; box-shadow:0 0 8px #8f21b1; }
+
+    @media (max-width:1100px) {
+      .content-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width:700px) {
+      .content-grid { grid-template-columns: 1fr; }
+    }
+
+    /* === SCROLLBAR FUTURISTA FURII === */
+.main-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+.main-content::-webkit-scrollbar-track {
+  background: rgba(10, 0, 20, 0.15);
+  border-radius: 10px;
+  box-shadow: inset 0 0 8px rgba(80, 0, 130, 0.25);
+}
+
+.main-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(160, 80, 255, 0.9), rgba(83, 0, 160, 0.7));
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(160, 80, 255, 0.6), 0 0 20px rgba(83, 0, 160, 0.4);
+  animation: glowScroll 2.4s infinite ease-in-out;
+}
+
+.main-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(200, 120, 255, 1), rgba(130, 0, 255, 0.8));
+  box-shadow: 0 0 20px rgba(200, 120, 255, 0.9);
+}
+
+@keyframes glowScroll {
+  0%, 100% { box-shadow: 0 0 10px rgba(160, 80, 255, 0.6); }
+  50% { box-shadow: 0 0 25px rgba(200, 120, 255, 1); }
+}
+
+/* Suporte para Firefox */
+.main-content {
+  scrollbar-color: rgba(160, 80, 255, 0.8) rgba(10, 0, 20, 0.15);
+  scrollbar-width: thin;
+}
+
+  </style>
+</head>
+
+<body>
+  <div class="dashboard-container">
+    <!-- SIDEBAR (exatamente igual ao dashboard.html) -->
+    <aside class="sidebar">
+      <a href="furiichat.html">
+  <img src="Imagens/furihead.png" alt="Furii" class="sidebar-logo" />
+</a>
+
+      <a href="#" class="active" title="Painel"><i class='bx bx-home'></i></a>
+      <a href="graficos.html" title="Gráficos"><i class='bx bx-bar-chart-alt-2'></i></a>
+      <a href="historico.html" title="Histórico"><i class='bx bx-time'></i></a>
+      <a href="conta.html" title="Conta"><i class='bx bx-user'></i></a>
+      <a href="configuracoes.html" title="Configurações"><i class='bx bx-cog'></i></a>
+      <a href="furiihub.html" title="Sair"><i class='bx bx-log-out'></i></a>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL (header idêntico ao dashboard.html) -->
+    <div class="main-content">
+      <header class="topbar">
+        <i class='bx bx-pulse'></i> GeoFurion Dashboard - Pro
+      </header>
+
+      <!-- (não incluí a inicialização do mapa para evitar erros — sidebar e header PERFEITAMENTE iguais) -->
+
+      <!-- HUD mantido (visual idêntico disponível) -->
+      <div class="hud-container" aria-hidden="true">
+        <div class="hud-card">
+          <i class='bx bx-broadcast'></i>
+          <div>
+            <h4>Monitoramento Ativo</h4>
+            <p>12 dispositivos online</p>
+          </div>
+        </div>
+        <div class="hud-card">
+          <i class='bx bx-map-pin'></i>
+          <div>
+            <h4>Geofencing Inteligente</h4>
+            <p>3 zonas seguras</p>
+          </div>
+        </div>
+        <div class="hud-card">
+          <i class='bx bx-lock-alt'></i>
+          <div>
+            <h4>Segurança de Dados</h4>
+            <p>AES-256 • TLS 1.3</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTEÚDO DO HISTÓRICO (mantendo o header/sidebar idênticos) -->
+      <div class="inner-content">
+        <div class="content-grid">
+          <!-- Gráfico 1 -->
+          <div class="card">
+            <h3>Atividade Semanal</h3>
+            <p style="color:#c7b8e4; margin:6px 0 10px;">Eventos registrados nos últimos 7 dias.</p>
+            <div id="chart1" class="chart"></div>
+          </div>
+
+          <!-- Gráfico 2 -->
+          <div class="card">
+            <h3>Acessos por Categoria</h3>
+            <p style="color:#c7b8e4; margin:6px 0 10px;">Distribuição das ações executadas.</p>
+            <div id="chart2" class="chart"></div>
+          </div>
+
+          <!-- Tabela (ocupa 1 coluna) -->
+          <div class="card" style="grid-column: span 3;">
+            <h3>Logs Recentes</h3>
+            <p style="color:#c7b8e4; margin:6px 0 10px;">Últimos registros do sistema GeoFurion.</p>
+            <table>
+              <thead>
+                <tr><th>Data</th><th>Usuário</th><th>Ação</th><th>Status</th><th>Local</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>10/10/2025</td><td>admin</td><td>Login</td><td>Sucesso</td><td>São Paulo</td></tr>
+                <tr><td>10/10/2025</td><td>sensor01</td><td>Envio de dados</td><td>Concluído</td><td>Centro</td></tr>
+                <tr><td>09/10/2025</td><td>admin</td><td>Exportar Relatório</td><td>Sucesso</td><td>Web</td></tr>
+                <tr><td>09/10/2025</td><td>sensor03</td><td>Falha de Conexão</td><td>Erro</td><td>Zona Sul</td></tr>
+                <tr><td>08/10/2025</td><td>AI Furii</td><td>Treinamento</td><td>Concluído</td><td>Servidor</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Timeline -->
+          <div class="card" style="grid-column: span 3;">
+            <h3>Timeline de Eventos</h3>
+            <p style="color:#c7b8e4; margin:6px 0 10px;">Resumo das principais ocorrências recentes.</p>
+            <div class="timeline" aria-hidden="false">
+              <div class="timeline-item">
+                <strong style="color:#fff">Backup Automático Concluído</strong><br>
+                <small style="color:#c7b8e4">10/10/2025 • 23:40</small>
+                <p style="color:#ddd; margin-top:6px;">O backup de dados do sistema foi finalizado com sucesso.</p>
+              </div>
+
+              <div class="timeline-item">
+                <strong style="color:#fff">Nova Zona Segura Criada</strong><br>
+                <small style="color:#c7b8e4">10/10/2025 • 21:10</small>
+                <p style="color:#ddd; margin-top:6px;">Zona “Escritório Paulista” adicionada ao monitoramento ativo.</p>
+              </div>
+
+              <div class="timeline-item">
+                <strong style="color:#fff">Detecção Anômala — Sensor 03</strong><br>
+                <small style="color:#c7b8e4">09/10/2025 • 16:25</small>
+                <p style="color:#ddd; margin-top:6px;">IA Furii detectou padrões de ruído fora do normal no sensor.</p>
+              </div>
+
+              <div class="timeline-item">
+                <strong style="color:#fff">Usuário admin acessou o Painel</strong><br>
+                <small style="color:#c7b8e4">09/10/2025 • 08:45</small>
+                <p style="color:#ddd; margin-top:6px;">Acesso bem-sucedido ao painel administrativo corporativo.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scripts de gráficos -->
+  <script>
+    const baseOpts = {
+      chart:{ foreColor:'#e7dfff', toolbar:{show:false}, background:'transparent' },
+      tooltip:{ theme:'dark' }
+    };
+
+    // Gráfico 1 (linha)
+    new ApexCharts(document.querySelector("#chart1"), {
+      ...baseOpts,
+      chart:{...baseOpts.chart,type:'line',height:220},
+      series:[{name:'Eventos',data:[20,34,28,40,38,35,42]}],
+      xaxis:{categories:['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],labels:{style:{colors:'#c7b8e4'}}},
+      colors:['#a065ff'],
+      stroke:{curve:'smooth',width:3}
+    }).render();
+
+    // Gráfico 2 (barra)
+    new ApexCharts(document.querySelector("#chart2"), {
+      ...baseOpts,
+      chart:{...baseOpts.chart,type:'bar',height:220},
+      series:[{name:'Acessos',data:[45,30,20,15]}],
+      xaxis:{categories:['Login','Upload','Alertas','Config'],labels:{style:{colors:'#c7b8e4'}}},
+      colors:['#8f21b1'],
+      plotOptions:{bar:{borderRadius:6,columnWidth:'55%'}}
+    }).render();
+  </script>
+</body>
+</html>
+
+
+
+
+
+

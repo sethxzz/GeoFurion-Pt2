@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoFurion Dashboard - Pro</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+  <link rel="icon" href="Imagens/Logo.png" type="image/png" />
+
+  <style>
+    body {
+      margin: 0;
+      background-color: #0b0014;
+      font-family: system-ui, sans-serif;
+      overflow: hidden;
+      color: #fff;
+    }
+
+    /* FUNDO ANIMADO */
+    .background-lights {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .light {
+      position: absolute;
+      bottom: -10%;
+      width: 3px;
+      height: 100px;
+      background: linear-gradient(180deg, transparent, rgba(160, 80, 255, 0.8));
+      border-radius: 50%;
+      animation: rise 7s linear infinite;
+      opacity: 0.5;
+    }
+
+    @keyframes rise {
+      0% { transform: translateY(0); opacity: 0.3; }
+      50% { opacity: 1; }
+      100% { transform: translateY(-120vh); opacity: 0; }
+    }
+
+    .light:nth-child(1) { left: 10%; animation-delay: 0s; }
+    .light:nth-child(2) { left: 25%; animation-delay: 2s; }
+    .light:nth-child(3) { left: 40%; animation-delay: 4s; }
+    .light:nth-child(4) { left: 60%; animation-delay: 1s; }
+    .light:nth-child(5) { left: 80%; animation-delay: 3s; }
+    .light:nth-child(6) { left: 90%; animation-delay: 5s; }
+
+    .dashboard-container {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* SIDEBAR - idêntica à do graficos.html */
+    .sidebar {
+      width: 80px;
+      background: linear-gradient(180deg, #0a0012, #140022);
+      border-right: 2px solid #5300a0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem 0;
+      box-shadow: 0 0 25px rgba(130, 0, 255, 0.25);
+      z-index: 10;
+    }
+
+    .sidebar-logo {
+      width: 48px;
+      margin-bottom: 2rem;
+      filter: drop-shadow(0 0 10px #5300a0);
+    }
+
+    .sidebar a {
+      color: #a065ff;
+      text-decoration: none;
+      font-size: 1.6rem;
+      margin: 1rem 0;
+      transition: 0.3s;
+    }
+
+    .sidebar a:hover {
+      color: #fff;
+      transform: scale(1.1);
+    }
+
+    .sidebar a.active {
+      color: #fff;
+      text-shadow: 0 0 10px #8f21b1;
+    }
+
+    /* HEADER - igual ao graficos.html */
+    .main-content {
+      flex: 1;
+      position: relative;
+      overflow-y: auto;
+      height: 100vh;
+    }
+
+    .topbar {
+      background: rgba(0, 0, 0, 0.8);
+      border-bottom: 1px solid #5300a0;
+      padding: 0.8rem 1.5rem;
+      font-size: 1.2rem;
+      color: #a065ff;
+      box-shadow: 0 0 15px rgba(130, 0, 255, 0.2);
+      z-index: 5;
+      position: sticky;
+      top: 0;
+    }
+
+    /* CONFIGURAÇÕES */
+    .settings-container {
+      padding: 2rem 2.5rem;
+      margin-left: 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+
+    .settings-box {
+      background: rgba(12, 0, 24, 0.6);
+      border: 1px solid rgba(130, 0, 255, 0.3);
+      box-shadow: 0 0 25px rgba(130, 0, 255, 0.15);
+      border-radius: 14px;
+      padding: 1.8rem 2rem;
+      backdrop-filter: blur(6px);
+      transition: 0.3s;
+      width: 90%; /* 🔧 Diminuído de 100% para 90% */
+      max-width: 780px; /* 🔧 Limite horizontal adicionado */
+    }
+
+    .settings-box:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 40px rgba(143, 33, 177, 0.35);
+    }
+
+    .settings-box h2 {
+      font-size: 1.2rem;
+      text-shadow: 0 0 10px #a065ff;
+      margin-bottom: 0.6rem;
+      color: #fff;
+    }
+
+    .settings-box p {
+      color: #c7b8e4;
+      font-size: 0.9rem;
+      margin-bottom: 1.2rem;
+      line-height: 1.4;
+    }
+
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 0.8rem;
+      border-top: 1px solid rgba(130, 0, 255, 0.15);
+    }
+
+    /* Botões liga/desliga */
+    .toggle {
+      position: relative;
+      width: 58px;
+      height: 30px;
+      background: rgba(83, 0, 160, 0.3);
+      border-radius: 30px;
+      border: 1px solid rgba(160, 80, 255, 0.4);
+      cursor: pointer;
+      transition: 0.4s;
+      box-shadow: inset 0 0 10px rgba(143, 33, 177, 0.3);
+    }
+
+    .toggle::before {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #a065ff;
+      box-shadow: 0 0 10px #8f21b1;
+      transition: 0.3s;
+    }
+
+    .toggle.active {
+      background: linear-gradient(90deg, #5300a0, #8f21b1);
+      box-shadow: 0 0 20px #8f21b1;
+    }
+
+    .toggle.active::before {
+      left: 31px;
+      background: #fff;
+      box-shadow: 0 0 15px #a065ff;
+    }
+
+    /* === SCROLLBAR FUTURISTA FURII === */
+.main-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+.main-content::-webkit-scrollbar-track {
+  background: rgba(10, 0, 20, 0.15);
+  border-radius: 10px;
+  box-shadow: inset 0 0 8px rgba(80, 0, 130, 0.25);
+}
+
+.main-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(160, 80, 255, 0.9), rgba(83, 0, 160, 0.7));
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(160, 80, 255, 0.6), 0 0 20px rgba(83, 0, 160, 0.4);
+  animation: glowScroll 2.4s infinite ease-in-out;
+}
+
+.main-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(200, 120, 255, 1), rgba(130, 0, 255, 0.8));
+  box-shadow: 0 0 20px rgba(200, 120, 255, 0.9);
+}
+
+@keyframes glowScroll {
+  0%, 100% { box-shadow: 0 0 10px rgba(160, 80, 255, 0.6); }
+  50% { box-shadow: 0 0 25px rgba(200, 120, 255, 1); }
+}
+
+/* Suporte para Firefox */
+.main-content {
+  scrollbar-color: rgba(160, 80, 255, 0.8) rgba(10, 0, 20, 0.15);
+  scrollbar-width: thin;
+}
+
+  </style>
+</head>
+
+<body>
+  <div class="background-lights">
+    <div class="light"></div>
+    <div class="light"></div>
+    <div class="light"></div>
+    <div class="light"></div>
+    <div class="light"></div>
+    <div class="light"></div>
+  </div>
+
+  <div class="dashboard-container">
+    <aside class="sidebar">
+      <a href="furiichat.html">
+  <img src="Imagens/furihead.png" alt="Furii" class="sidebar-logo" />
+</a>
+
+      <a href="dashboard.html" title="Painel"><i class='bx bx-home'></i></a>
+      <a href="graficos.html" title="Gráficos"><i class='bx bx-bar-chart-alt-2'></i></a>
+      <a href="historico.html" title="Histórico"><i class='bx bx-time'></i></a>
+      <a href="conta.html" title="Conta"><i class='bx bx-user'></i></a>
+      <a href="configuracoes.html" class="active" title="Configurações"><i class='bx bx-cog'></i></a>
+      <a href="furiihub.html" title="Sair"><i class='bx bx-log-out'></i></a>
+    </aside>
+
+    <div class="main-content">
+      <header class="topbar">
+        <i class='bx bx-pulse'></i> GeoFurion Dashboard - Pro
+      </header>
+
+      <section class="settings-container">
+        <div class="settings-box">
+          <h2>Visual dos Gráficos</h2>
+          <p>Permite habilitar o modo neon dinâmico, destacando cores e animações nos gráficos para melhor visualização dos dados.</p>
+          <div class="setting-item">
+            <span>Ativar Modo Neon</span>
+            <div class="toggle active" onclick="toggleActive(this)"></div>
+          </div>
+        </div>
+
+        <div class="settings-box">
+          <h2>Assistente de Voz Furii</h2>
+          <p>O assistente de voz permite executar comandos, consultas e interações sem a necessidade de cliques manuais.</p>
+          <div class="setting-item">
+            <span>Habilitar Comandos de Voz</span>
+            <div class="toggle" onclick="toggleActive(this)"></div>
+          </div>
+        </div>
+
+        <div class="settings-box">
+          <h2>Conexão IoT</h2>
+          <p>Conecte automaticamente sensores e dispositivos IoT registrados na rede do GeoFurion.</p>
+          <div class="setting-item">
+            <span>Conectar Automaticamente</span>
+            <div class="toggle active" onclick="toggleActive(this)"></div>
+          </div>
+        </div>
+
+        <div class="settings-box">
+          <h2>Relatórios Inteligentes</h2>
+          <p>Gera relatórios automáticos com base em análises preditivas feitas pela IA Furii.</p>
+          <div class="setting-item">
+            <span>Ativar Relatórios IA</span>
+            <div class="toggle active" onclick="toggleActive(this)"></div>
+          </div>
+        </div>
+
+        <div class="settings-box">
+          <h2>Sincronização em Nuvem</h2>
+          <p>Sincronize automaticamente seus dados e configurações para garantir segurança e continuidade das informações.</p>
+          <div class="setting-item">
+            <span>Backup Automático</span>
+            <div class="toggle active" onclick="toggleActive(this)"></div>
+          </div>
+        </div>
+
+        <div class="settings-box">
+          <h2>Desempenho</h2>
+          <p>Otimize o uso de recursos do sistema priorizando velocidade ou qualidade gráfica, dependendo da necessidade operacional.</p>
+          <div class="setting-item">
+            <span>Ativar Modo Alto Desempenho</span>
+            <div class="toggle active" onclick="toggleActive(this)"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    function toggleActive(el) {
+      el.classList.toggle('active');
+    }
+  </script>
+</body>
+</html>
+
+

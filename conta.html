@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoFurion Dashboard - Pro</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+  <link rel="icon" href="Imagens/Logo.png" type="image/png" />
+
+  <style>
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 50% 100%, #12001f 0%, #0a0014 100%);
+      font-family: system-ui, sans-serif;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    /* Fundo animado */
+    .background-lights {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .light {
+      position: absolute;
+      bottom: -10%;
+      width: 3px;
+      height: 100px;
+      background: linear-gradient(180deg, transparent, rgba(160, 80, 255, 0.8));
+      border-radius: 50%;
+      animation: rise 7s linear infinite;
+      opacity: 0.5;
+    }
+
+    @keyframes rise {
+      0% { transform: translateY(0); opacity: 0.3; }
+      50% { opacity: 1; }
+      100% { transform: translateY(-120vh); opacity: 0; }
+    }
+
+    .light:nth-child(1) { left: 10%; animation-delay: 0s; }
+    .light:nth-child(2) { left: 25%; animation-delay: 2s; }
+    .light:nth-child(3) { left: 40%; animation-delay: 4s; }
+    .light:nth-child(4) { left: 60%; animation-delay: 1s; }
+    .light:nth-child(5) { left: 80%; animation-delay: 3s; }
+    .light:nth-child(6) { left: 90%; animation-delay: 5s; }
+
+    .dashboard-container {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 80px;
+      background: linear-gradient(180deg, #0a0012, #140022);
+      border-right: 2px solid #5300a0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem 0;
+      box-shadow: 0 0 25px rgba(130, 0, 255, 0.25);
+      z-index: 10;
+    }
+
+    .sidebar-logo {
+      width: 48px;
+      margin-bottom: 2rem;
+      filter: drop-shadow(0 0 10px #5300a0);
+    }
+
+    .sidebar a {
+      color: #a065ff;
+      text-decoration: none;
+      font-size: 1.6rem;
+      margin: 1rem 0;
+      transition: 0.3s;
+    }
+
+    .sidebar a:hover {
+      color: #fff;
+      transform: scale(1.1);
+    }
+
+    .sidebar a.active {
+      color: #fff;
+      text-shadow: 0 0 10px #8f21b1;
+    }
+
+    /* Header */
+    .main-content {
+      flex: 1;
+      position: relative;
+      overflow-y: auto;
+      height: 100vh;
+    }
+
+    .topbar {
+      background: rgba(0, 0, 0, 0.8);
+      border-bottom: 1px solid #5300a0;
+      padding: 0.8rem 1.5rem;
+      font-size: 1.2rem;
+      color: #a065ff;
+      box-shadow: 0 0 15px rgba(130, 0, 255, 0.2);
+      z-index: 5;
+      position: sticky;
+      top: 0;
+    }
+
+    /* Conteúdo */
+    .account-content {
+      padding: 2rem;
+      margin-left: 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .account-card {
+      background: rgba(15, 0, 35, 0.5);
+      border: 1px solid rgba(130, 0, 255, 0.3);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 0 20px rgba(143, 33, 177, 0.2);
+      transition: 0.3s;
+      backdrop-filter: blur(8px);
+    }
+
+    .account-card:hover {
+      box-shadow: 0 0 35px rgba(143, 33, 177, 0.4);
+    }
+
+    .account-header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .account-header h3 {
+      margin: 0;
+      color: #fff;
+      font-size: 1.1rem;
+    }
+
+    .account-header span {
+      color: #bca8e9;
+      font-size: 0.85rem;
+    }
+
+    .manage-button {
+      margin-top: 1rem;
+      background: linear-gradient(90deg, #5300a0, #8f21b1);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.3s;
+      align-self: flex-start;
+    }
+
+    .manage-button:hover {
+      box-shadow: 0 0 15px #8f21b1;
+      transform: scale(1.05);
+    }
+
+    /* Lista de opções */
+    .settings-section {
+      background: rgba(12, 0, 24, 0.45);
+      border: 1px solid rgba(130, 0, 255, 0.25);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 25px rgba(143, 33, 177, 0.15);
+    }
+
+    .settings-section h4 {
+      margin: 1rem 1.5rem;
+      font-size: 1rem;
+      color: #d4c7f7;
+      font-weight: normal;
+    }
+
+    .settings-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      border-top: 1px solid rgba(130, 0, 255, 0.15);
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    .settings-item:first-child {
+      border-top: none;
+    }
+
+    .settings-item:hover {
+      background: rgba(83, 0, 160, 0.2);
+      box-shadow: inset 0 0 10px rgba(130, 0, 255, 0.15);
+    }
+
+    .settings-left {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .settings-left i {
+      font-size: 1.4rem;
+      color: #a065ff;
+    }
+
+    .settings-left span {
+      font-size: 0.95rem;
+      color: #fff;
+    }
+
+    .settings-right i {
+      font-size: 1.3rem;
+      color: #a065ff;
+    }
+
+    /* Foto */
+    .photo-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .photo-section img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #8f21b1;
+      box-shadow: 0 0 10px rgba(143, 33, 177, 0.3);
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    /* === SCROLLBAR FUTURISTA FURII === */
+.main-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+.main-content::-webkit-scrollbar-track {
+  background: rgba(10, 0, 20, 0.15);
+  border-radius: 10px;
+  box-shadow: inset 0 0 8px rgba(80, 0, 130, 0.25);
+}
+
+.main-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(160, 80, 255, 0.9), rgba(83, 0, 160, 0.7));
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(160, 80, 255, 0.6), 0 0 20px rgba(83, 0, 160, 0.4);
+  animation: glowScroll 2.4s infinite ease-in-out;
+}
+
+.main-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(200, 120, 255, 1), rgba(130, 0, 255, 0.8));
+  box-shadow: 0 0 20px rgba(200, 120, 255, 0.9);
+}
+
+@keyframes glowScroll {
+  0%, 100% { box-shadow: 0 0 10px rgba(160, 80, 255, 0.6); }
+  50% { box-shadow: 0 0 25px rgba(200, 120, 255, 1); }
+}
+
+/* Suporte para Firefox */
+.main-content {
+  scrollbar-color: rgba(160, 80, 255, 0.8) rgba(10, 0, 20, 0.15);
+  scrollbar-width: thin;
+}
+
+  </style>
+</head>
+<body>
+  <div class="background-lights">
+    <div class="light"></div><div class="light"></div><div class="light"></div>
+    <div class="light"></div><div class="light"></div><div class="light"></div>
+  </div>
+
+  <div class="dashboard-container">
+    <aside class="sidebar">
+      <a href="furiichat.html">
+  <img src="Imagens/furihead.png" alt="Furii" class="sidebar-logo" />
+</a>
+
+      <a href="dashboard.html"><i class='bx bx-home'></i></a>
+      <a href="graficos.html"><i class='bx bx-bar-chart-alt-2'></i></a>
+      <a href="historico.html"><i class='bx bx-time'></i></a>
+      <a href="conta.html" class="active"><i class='bx bx-user'></i></a>
+      <a href="configuracoes.html"><i class='bx bx-cog'></i></a>
+      <a href="furiihub.html"><i class='bx bx-log-out'></i></a>
+    </aside>
+
+    <div class="main-content">
+      <header class="topbar">
+        <i class='bx bx-pulse'></i> GeoFurion Dashboard - Pro
+      </header>
+
+      <div class="account-content">
+        <div class="account-card">
+          <div class="photo-section">
+            <img id="profilePreview" src="Imagens/furihead.png" alt="Foto de perfil" />
+            <div>
+              <div class="account-header">
+                <h3>Assinante desde janeiro de 2025</h3>
+                <span>Plano Pro - GeoFurion Pro</span>
+              </div>
+              <button class="manage-button" onclick="document.getElementById('fileInput').click()">Alterar Foto</button>
+              <input type="file" id="fileInput" accept="image/*" onchange="previewPhoto(event)">
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h4>Conta e Segurança</h4>
+          <div class="settings-item"><div class="settings-left"><i class='bx bx-id-card'></i><span>Informações pessoais</span></div><div class="settings-right"><i class='bx bx-chevron-right'></i></div></div>
+          <div class="settings-item"><div class="settings-left"><i class='bx bx-lock'></i><span>Atualizar senha</span></div><div class="settings-right"><i class='bx bx-chevron-right'></i></div></div>
+          <div class="settings-item"><div class="settings-left"><i class='bx bx-current-location'></i><span>Gerenciar locais</span></div><div class="settings-right"><i class='bx bx-chevron-right'></i></div></div>
+        </div>
+
+        <div class="settings-section">
+          <h4>Plano e Assinatura</h4>
+          <div class="settings-item"><div class="settings-left"><i class='bx bx-layer'></i><span>Alterar plano</span></div><div class="settings-right"><i class='bx bx-chevron-right'></i></div></div>
+          <div class="settings-item"><div class="settings-left"><i class='bx bx-credit-card'></i><span>Gerenciar pagamento</span></div><div class="settings-right"><i class='bx bx-chevron-right'></i></div></div>
+        </div>
+
+        <div class="settings-section">
+          <h4>Privacidade e Notificações</h4>
+          <div class="settings-item"><div class="settings-left"><i class='bx bx-shield'></i><span>LGPD e privacidade</span></div><div class="settings-right"><i class='bx bx-chevron-right'></i></div></div>
+          <div class="settings-item"><div class="settings-left"><i class='bx bx-bell'></i><span>Preferências de notificações</span></div><div class="settings-right"><i class='bx bx-chevron-right'></i></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function previewPhoto(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => document.getElementById('profilePreview').src = e.target.result;
+        reader.readAsDataURL(file);
+      }
+    }
+  </script>
+</body>
+</html>
+
+

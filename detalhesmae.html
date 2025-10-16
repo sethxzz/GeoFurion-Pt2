@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resumo de Mãe - GeoFurion</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(circle at top, #14002a 0%, #05000a 90%);
+      color: #fff;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Fundo animado com partículas */
+    .particles {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .particle {
+      position: absolute;
+      bottom: -10px;
+      width: 6px;
+      height: 6px;
+      background: radial-gradient(circle, #b45bff 0%, transparent 70%);
+      border-radius: 50%;
+      animation: rise 6s linear infinite;
+      opacity: 0.6;
+    }
+
+    @keyframes rise {
+      0% { transform: translateY(0) scale(0.7); opacity: 0.7; }
+      100% { transform: translateY(-120vh) scale(1); opacity: 0; }
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      padding: 20px 40px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .back-btn {
+      font-size: 1.8rem;
+      color: #b45bff;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+
+    .back-btn:hover {
+      color: #d38bff;
+      transform: scale(1.15);
+    }
+
+    /* Painel de Ícones Superiores */
+    .stats-panel {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 50px;
+      margin-top: 20px;
+      z-index: 2;
+      position: relative;
+    }
+
+    .stat-item {
+      background: rgba(40, 0, 80, 0.6);
+      border: 1px solid rgba(150, 0, 255, 0.3);
+      border-radius: 20px;
+      padding: 20px 30px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(150, 0, 255, 0.3);
+      width: 180px;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .stat-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 35px rgba(200, 0, 255, 0.7);
+    }
+
+    .stat-item i {
+      font-size: 2rem;
+      color: #c57aff;
+      animation: pulseIcon 3s infinite;
+    }
+
+    @keyframes pulseIcon {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.1); }
+    }
+
+    .stat-item h3 {
+      font-size: 1.2rem;
+      color: #fff;
+      margin: 8px 0 4px 0;
+    }
+
+    .stat-item p {
+      color: #d1b3ff;
+      font-size: 0.9rem;
+    }
+
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 30px;
+      gap: 60px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .furii-btn {
+      position: relative;
+      background: linear-gradient(135deg, #250058, #370157);
+      color: white;
+      border: none;
+      border-radius: 100px;
+      padding: 30px 80px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 35px rgba(160, 0, 255, 0.6);
+      text-transform: uppercase;
+      animation: pulse 2.5s infinite;
+      overflow: visible;
+    }
+
+    .furii-btn img {
+      position: absolute;
+      top: -65px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      filter: drop-shadow(0 0 12px #c57aff);
+      z-index: 3;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 25px rgba(160, 0, 255, 0.6); transform: scale(1); }
+      50% { box-shadow: 0 0 60px rgba(200, 0, 255, 0.9); transform: scale(1.04); }
+    }
+
+    .charts {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 40px;
+      padding: 20px;
+    }
+
+    .chart-card {
+      background: rgba(30, 0, 60, 0.7);
+      border: 1px solid rgba(150, 0, 255, 0.3);
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(120, 0, 255, 0.4);
+      padding: 25px;
+      width: 420px;
+      height: 380px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.3s;
+    }
+
+    .chart-card:hover {
+      transform: translateY(-8px);
+    }
+
+    .chart-card h2 {
+      margin-bottom: 15px;
+      color: #c9a4ff;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: 300px !important;
+    }
+
+    /* Relatórios de Risco */
+    .reports {
+      width: 85%;
+      margin: 40px auto;
+      background: rgba(25, 0, 50, 0.7);
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 0 25px rgba(160, 0, 255, 0.4);
+      border: 1px solid rgba(180, 0, 255, 0.3);
+      position: relative;
+      z-index: 2;
+    }
+
+    .reports h2 {
+      color: #c57aff;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .report-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(150, 0, 255, 0.2);
+      padding: 12px 0;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeIn 1s forwards;
+    }
+
+    .report-item:nth-child(2) { animation-delay: 0.5s; }
+    .report-item:nth-child(3) { animation-delay: 1s; }
+    .report-item:nth-child(4) { animation-delay: 1.5s; }
+    .report-item:nth-child(5) { animation-delay: 2s; }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(10px); filter: brightness(0.6); }
+      100% { opacity: 1; transform: translateY(0); filter: brightness(1); }
+    }
+
+    .report-item i {
+      color: #ff7cff;
+      font-size: 1.3rem;
+      animation: glow 3s infinite ease-in-out;
+    }
+
+    @keyframes glow {
+      0%, 100% { text-shadow: 0 0 5px #b45bff, 0 0 15px #b45bff; }
+      50% { text-shadow: 0 0 20px #ff7cff, 0 0 30px #ff7cff; }
+    }
+
+    .report-text {
+      flex: 1;
+      margin-left: 15px;
+      color: #e5d4ff;
+    }
+
+    footer {
+      text-align: center;
+      color: #8a6bd9;
+      margin: 40px 0;
+      font-size: 0.9rem;
+      opacity: 0.7;
+      z-index: 2;
+      position: relative;
+    }
+
+    /* === SCROLLBAR FUTURISTA FURII === */
+.main-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+.main-content::-webkit-scrollbar-track {
+  background: rgba(10, 0, 20, 0.15);
+  border-radius: 10px;
+  box-shadow: inset 0 0 8px rgba(80, 0, 130, 0.25);
+}
+
+.main-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(160, 80, 255, 0.9), rgba(83, 0, 160, 0.7));
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(160, 80, 255, 0.6), 0 0 20px rgba(83, 0, 160, 0.4);
+  animation: glowScroll 2.4s infinite ease-in-out;
+}
+
+.main-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(200, 120, 255, 1), rgba(130, 0, 255, 0.8));
+  box-shadow: 0 0 20px rgba(200, 120, 255, 0.9);
+}
+
+@keyframes glowScroll {
+  0%, 100% { box-shadow: 0 0 10px rgba(160, 80, 255, 0.6); }
+  50% { box-shadow: 0 0 25px rgba(200, 120, 255, 1); }
+}
+
+/* Suporte para Firefox */
+.main-content {
+  scrollbar-color: rgba(160, 80, 255, 0.8) rgba(10, 0, 20, 0.15);
+  scrollbar-width: thin;
+}
+
+  </style>
+</head>
+<body>
+  <div class="particles"></div>
+
+  <header>
+    <a href="dashboard.html" class="back-btn"><i class="bi bi-arrow-left-circle"></i></a>
+  </header>
+
+  <section class="stats-panel">
+    <div class="stat-item"><i class="bi bi-car-front"></i><h3>Viagens</h3><p>12 nesta semana</p></div>
+    <div class="stat-item"><i class="bi bi-geo-alt"></i><h3>Km percorridos</h3><p>178 km</p></div>
+    <div class="stat-item"><i class="bi bi-clock-history"></i><h3>Tempo fora</h3><p>22h totais</p></div>
+    <div class="stat-item"><i class="bi bi-exclamation-triangle"></i><h3>Alertas</h3><p>3 nesta semana</p></div>
+  </section>
+
+  <section class="main-container">
+    <button class="furii-btn">
+      <img src="Imagens/furihead.png" alt="Logo Furii">
+      Resumo Furii
+    </button>
+
+    <div class="charts">
+      <div class="chart-card"><h2>Atividade de Hoje</h2><canvas id="dailyChart"></canvas></div>
+      <div class="chart-card"><h2>Resumo Semanal</h2><canvas id="weeklyChart"></canvas></div>
+      <div class="chart-card"><h2>Resumo Mensal</h2><canvas id="monthlyChart"></canvas></div>
+    </div>
+  </section>
+
+  <section class="reports">
+    <h2>Relatórios de Risco e Atividades Recentes</h2>
+    <div class="report-item"><i class="bi bi-car-front"></i><div class="report-text">Batida leve detectada na Avenida Manoel Pedro Pimentel — 09/10 às 16:42</div></div>
+    <div class="report-item"><i class="bi bi-shield-exclamation"></i><div class="report-text">Passagem inesperada próxima a um ponto de blitz — 11/10 às 21:07</div></div>
+    <div class="report-item"><i class="bi bi-lightning"></i><div class="report-text">Desvio de rota detectado no caminho da academia — 12/10 às 18:31</div></div>
+    <div class="report-item"><i class="bi bi-geo"></i><div class="report-text">Entrada em zona de risco leve registrada — 13/10 às 20:22</div></div>
+  </section>
+
+  <footer>© 2025 GeoFurion</footer>
+
+  <script>
+    const container = document.querySelector(".particles");
+    for (let i = 0; i < 50; i++) {
+      const p = document.createElement("div");
+      p.classList.add("particle");
+      p.style.left = Math.random() * 100 + "%";
+      p.style.animationDuration = 4 + Math.random() * 4 + "s";
+      p.style.animationDelay = Math.random() * 5 + "s";
+      container.appendChild(p);
+    }
+
+    const gradient = (ctx) => {
+      const grad = ctx.createLinearGradient(0, 0, 0, 400);
+      grad.addColorStop(0, "rgba(180,0,255,0.8)");
+      grad.addColorStop(1, "rgba(50,0,100,0.2)");
+      return grad;
+    };
+
+    new Chart(document.getElementById("dailyChart"), {
+      type: "bar",
+      data: {
+        labels: ["06h","08h","10h","12h","14h","16h","18h","20h"],
+        datasets: [{
+          label: "Horas Ativas",
+          data: [2,4,5,6,3,4,2,1],
+          backgroundColor: gradient(document.getElementById("dailyChart").getContext("2d")),
+          borderColor: "#c57aff",
+          borderWidth: 1.5,
+          borderRadius: 8
+        }]
+      },
+      options: { plugins: { legend: { display: false } } }
+    });
+
+    new Chart(document.getElementById("weeklyChart"), {
+      type: "line",
+      data: {
+        labels: ["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"],
+        datasets: [{
+          data: [32,36,31,38,40,22,28],
+          borderColor: "#c57aff",
+          borderWidth: 3,
+          fill: true,
+          backgroundColor: gradient(document.getElementById("weeklyChart").getContext("2d")),
+          tension: 0.4,
+          pointBackgroundColor: "#fff"
+        }]
+      },
+      options: { plugins: { legend: { display: false } } }
+    });
+
+    new Chart(document.getElementById("monthlyChart"), {
+      type: "doughnut",
+      data: {
+        labels: ["Trabalho", "Casa", "Academia", "Descanso"],
+        datasets: [{
+          data: [45, 25, 15, 15],
+          backgroundColor: [
+            "rgba(197,122,255,0.9)",
+            "rgba(122,33,255,0.9)",
+            "rgba(80,0,180,0.9)",
+            "rgba(43,0,72,0.9)"
+          ],
+          hoverOffset: 15,
+          borderWidth: 2,
+          borderColor: "#180028"
+        }]
+      },
+      options: {
+        cutout: "65%",
+        plugins: { legend: { labels: { color: "#e4d2ff" } } }
+      }
+    });
+  </script>
+</body>
+</html>
+
